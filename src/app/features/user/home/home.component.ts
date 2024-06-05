@@ -91,7 +91,7 @@ export class HomeComponent implements OnInit {
       console.log('Registration successful', this.registerForm.value);
       this.AuthServ.CompanyReegister(this.registerForm.value).subscribe(data=>{
         console.log(data);
-        
+        this.AuthServ.stateItem$.subscribe(data=>{})
       })
       // Handle successful registration, e.g., make API call
       this.modalService.dismissAll(this.registerForm.value);

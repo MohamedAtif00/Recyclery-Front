@@ -22,7 +22,7 @@ export class LoginComponent {
 
   onLoginSubmit(): void {
     if (this.loginForm.valid) {
-      this.authService.login(this.loginForm.value).subscribe(
+      this.authService.AdminLogin(this.loginForm.value).subscribe(
         (response) => {
           console.log('Login successful', response);
           // Add any further logic, such as redirecting to a different page

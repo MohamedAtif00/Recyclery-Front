@@ -22,6 +22,7 @@ import { provideAnimationsAsync } from '@angular/platform-browser/animations/asy
 import { MatOptionModule } from '@angular/material/core';
 import { BrowserAnimationsModule  } from '@angular/platform-browser/animations';
 import { ToastrModule } from 'ngx-toastr';
+import { AuthInterceptor } from './core/interceptor/auth.interceptor';
 
 
 
@@ -58,7 +59,12 @@ import { ToastrModule } from 'ngx-toastr';
   providers: [
     AuthService,
     TranslationService,
-    provideAnimationsAsync()
+    provideAnimationsAsync(),
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: AuthInterceptor,
+      multi: true
+    }
   ],
   bootstrap: [AppComponent]
 })

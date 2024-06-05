@@ -12,6 +12,8 @@ export class AdminAuthGuard implements CanActivate {
 
   canActivate(): boolean {
     if (this.authService.isAuthenticated() && this.authService.isAdmin()) {
+      console.log(this.authService.isAdmin());
+      
       return true; // User is authenticated and has admin role
     } else {
       this.router.navigate(['admin/login']); // Redirect to login page if not authenticated or not admin

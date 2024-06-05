@@ -6,6 +6,7 @@ import { RegisterRequest } from "../model/request/register.model";
 import { environment } from "../../../environment";
 import { LoginRequest } from "../model/request/login.model";
 import { AdminRegister } from "../../features/admin/model/admin-register.model";
+import { Router } from "@angular/router";
 
 
 
@@ -26,7 +27,14 @@ export class AuthService {
   private stateItem: BehaviorSubject<IAuthInfo | null> = new BehaviorSubject<IAuthInfo | null>(this.getAuthInfoFromStorage());
   stateItem$: Observable<IAuthInfo | null> = this.stateItem.asObservable();
 
-  constructor(private _http: HttpClient) {}
+  constructor(private _http: HttpClient,private router:Router) {
+    console.log(this.isAdmin());
+    if(this.getAuthInfoFromStorage())
+      this.stateItem.next(this.getAuthInfoFromStorage());
+
+    console.log(this.stateItem.value?.role);
+    
+  }
 
   login(request:LoginRequest): Observable<IAuthInfo> {
     return this._http.post<IAuthInfo>(this.postLogin,request ).pipe(
@@ -47,6 +55,7 @@ export class AuthService {
         response.role = 'company';
         this.setAuthInfoToStorage(response);
         this.stateItem.next(response);
+        this.stateItem$ = this.stateItem.asObservable();
         return response;
       }),
       catchError(this.handleError)
@@ -57,7 +66,7 @@ export class AuthService {
   {
     return this._http.post<IAuthInfo>(this.postLoginAdmin,request ).pipe(
       map((response: IAuthInfo) => {
-        response.role = 'company';
+        response.role = 'admin';
         this.setAuthInfoToStorage(response);
         this.stateItem.next(response);
         return response;
@@ -84,16 +93,14 @@ export class AuthService {
   CompanyReegister(request:RegisterRequest)
   {
     return this._http.post<IAuthInfo>(this.postComapanyRegister,request).pipe(
-      map(
-        (response)=>{
-          response.role= 'company';
-          console.log('From Authentication Service',response);
-          this.setAuthInfoToStorage(response);
-          this.stateItem.next(response);
-          return response;
-        }
-      )
-    )
+      map((response: IAuthInfo) => {
+        response.role = 'company';
+        this.setAuthInfoToStorage(response);
+        this.stateItem.next(response);
+        return response;
+      }),
+      catchError(this.handleError)
+    );
   }
 
   AdminRegister(request:AdminRegister)
@@ -115,6 +122,7 @@ export class AuthService {
   logout(): void {
     this.clearAuthInfoFromStorage();
     this.stateItem.next(null);
+    this.router.navigate(['']);
   }
 
   isAuthenticated(): boolean {
@@ -131,6 +139,7 @@ export class AuthService {
   }
 
   private setAuthInfoToStorage(authInfo: IAuthInfo): void {
+    localStorage.removeItem('authInfo');
     localStorage.setItem('authInfo', JSON.stringify(authInfo));
   }
 

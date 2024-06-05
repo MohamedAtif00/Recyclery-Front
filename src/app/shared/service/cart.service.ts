@@ -4,12 +4,13 @@ import { Cart } from "../model/cart.model";
 import { Product } from "../model/product.model";
 import { environment } from "../../../environment";
 import { Basket } from "../model/basket.model";
-import { Observable, switchMap, tap } from "rxjs";
+import { Observable, catchError, switchMap, tap, throwError } from "rxjs";
 import { Item } from "../model/item.model";
 import { Order } from "../model/order.model";
 import { Address } from "../model/address.model";
 import { AuthService } from "../../core/services/authentcation.service";
 import { DeliveryMethod } from "../model/delivery-method.model";
+import { ToastrService } from "ngx-toastr";
 
 
 @Injectable({
@@ -35,7 +36,7 @@ export class CartService
     });
     Basket!:Basket;
 
-    constructor(private _http: HttpClient,private authServ:AuthService) {
+    constructor(private _http: HttpClient,private authServ:AuthService,private toastr:ToastrService) {
         _http.get<Basket>(this.getBusket).subscribe(data=>{
             this.Basket = data;
             this._productsSignal.set(data.items)
@@ -92,7 +93,13 @@ export class CartService
 
     removeWholeProduct(productName: string) {
         this._productsSignal.update(products => products.filter(p => p.productName !== productName));
-      }
+    }
+
+    emptyCart() {
+      this._productsSignal.set([]); // Clear the products
+      this.Basket.items = []; // Clear the basket items
+      this._http.post<Basket>(this.CreateOrUpdate, this.Basket).subscribe();
+    }
     
 
     getProducts() {
@@ -115,30 +122,41 @@ export class CartService
     return this.cart().products.reduce((total, product) => total + (product.price * product.quantity), 0);
     }
 
-    CreateOrder(address: Address): Observable<Order> {
-        let order: Order = {
-          basketId: '1',
-          deliveryMethodId: 1,
-          shipAddress: address
-        };
-    
-        return this.authServ.stateItem$.pipe(
-          switchMap(data => {
-            if (data?.role === 'user') {
-              return this._http.post<Order>(this.createOrder, order).pipe(
-                tap(() => {
-                  this._productsSignal.update(() => []);
-                })
-              );
-            } else {
-              return this._http.post<Order>(this.createCompanyOrder, order).pipe(
-                tap(() => {
-                  this._productsSignal.update(() => []);
-                })
-              );
-            }
-          })
-        );
-      }
+    CreateOrder(address: Address, deliveryMethodId: string): Observable<any> {
+      let order: Order = {
+        basketId: '1',
+        deliveryMethodId: parseInt(deliveryMethodId),
+        shipAddress: address
+      };
+  
+      console.log(order);
+  
+      return this.authServ.stateItem$.pipe(
+        switchMap(data => {
+          if (data?.role === 'user') {
+            return this._http.post<any>(this.createOrder, order).pipe(
+              tap(() => {
+                this._productsSignal.update(() => []);
+                this.emptyCart();
+                this.toastr.success('Order created successfully!', 'Success');
+              })
+            );
+          } else {
+            return this._http.post<any>(this.createCompanyOrder, order).pipe(
+              tap(() => {
+                this._productsSignal.update(() => []);
+                this.toastr.success('Company order created successfully!', 'Success');
+              })
+            );
+          }
+        }),
+        catchError(error => {
+          // this.toastr.error('An error occurred while creating the order', 'Error');
+          return throwError(error);
+        })
+      );
+    }
+  
+  
 
 }

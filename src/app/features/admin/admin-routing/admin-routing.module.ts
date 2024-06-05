@@ -9,6 +9,7 @@ import { RegisterComponent } from '../register/register.component';
 import { AdminAuthGuard } from '../../../core/guard/admin.canactivate.guard';
 import { UsersComponent } from '../users/users.component';
 import { CompaniesComponent } from '../companies/companies.component';
+import { ClientOrderComponent } from '../client-order/client-order.component';
 
 const routes:Routes = [
   {path:'',component:HomeComponent,children:[
@@ -16,12 +17,12 @@ const routes:Routes = [
     {path:'category',component:CategoryComponent},
     {path:'users',component:UsersComponent},
     {path:'companies',component:CompaniesComponent},
-    {path:'**',component:ProductsComponent}
+    {path:'clients-orders',component:ClientOrderComponent},
   ],
   canActivate:[AdminAuthGuard]},
 
   {path:'login',component:LoginComponent},
-  {path:'register',component:RegisterComponent}
+  {path:'register',component:RegisterComponent},
 ] 
 
 @NgModule({

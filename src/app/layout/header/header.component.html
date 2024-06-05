@@ -1,5 +1,5 @@
 <!-- Navigation-->
-<nav class="navbar navbar-expand-lg navbar-light fixed-top py-1 m-0" style="background-color: white !important;height: 70px;box-shadow: 0 1rem 1rem rgba(0, 0, 0, 0.15);">
+<nav class="navbar navbar-expand-lg navbar-light fixed-top py-1 m-0" style="background-color: white !important;height: 80px;box-shadow: 0 1rem 1rem rgba(0, 0, 0, 0.15);">
     <div class="container-fluid px-4 px-lg-5 mt-2">
         <a class="navbar-brand d-flex text-primary"  [routerLink]="['']">
             <img style="width: 70px;height: 70px;" src="../../../assets/img/main.jpg" alt="" srcset="">
@@ -24,14 +24,14 @@
             <li class="nav-item rounded-1 " style="background-color: #e7f5e8;"><a class="nav-link text-primary fw-light fs-6 " [routerLink]="['']">{{'header.Home'|translate}}</a></li>
             <li class="nav-item"><a class="nav-link text-primary  " [routerLink]="['book']">{{'header.Waste'|translate}}</a></li>
             <li class="nav-item"><a class="nav-link text-primary  " [routerLink]="['book']">{{'header.Book Now'|translate}}</a></li>
-            <li>
+            <!-- <li>
               <select #select (change)="switchLanguage(select)">
                 <option selected value="en">English</option>
                 <option value="ar">Arabic</option>
               </select>
-            </li>
-            <li class="nav-item basket-holder" >
-              <button class="btn basket-icon" type="button" (click)="toggleSidebar()">
+            </li> -->
+            <li class="nav-item basket-holder" *ngIf="authService.stateItem$ | async as user ">
+              <button class="btn basket-icon" type="button" (click)="toggleSidebar()" *ngIf="user.role != 'admin'">
                 <span class="basket-count" *ngIf="cartServ.getTotalQuantity()">{{cartServ.count()}}</span>
                 <img src="https://www.bekia-egypt.com/images/basket-icon.png" alt="basket" [ngClass]="{'lighter-image ':cartServ.count() == 0}" class="img-fluid  ">
               </button>
@@ -108,8 +108,8 @@
                   </div>
                 </button>
                 <ul class="dropdown-menu">
-                  <li><a class="dropdown-item fw-light " style="font-size: smaller;" >My Profile</a></li>
-                  <li><a class="dropdown-item fw-light " style="font-size: smaller;" >Settings</a></li>
+                  <!-- <li><a class="dropdown-item fw-light " style="font-size: smaller;" >My Profile</a></li>
+                  <li><a class="dropdown-item fw-light " style="font-size: smaller;" >Settings</a></li> -->
                   <li class="nav-item" *ngIf="authService.stateItem$ | async">
                     <a
                     class="dropdown-item fw-light " style="font-size: smaller;"
@@ -130,6 +130,7 @@
     </div>
   </nav>
 
+  <!-- ///////////// Register /////////////////////////-->
 
   <ng-template #register let-modal>
     <div class="modal-header">
@@ -206,6 +207,7 @@
     </div>
   </ng-template>
   
+  
   <ng-template [ngIf]="true"  >
     <aside class="basket-drawer bg-light  d-flex flex-column justify-content-between pt-4"
            [ngClass]="{'open':isOpen}" 
@@ -280,7 +282,7 @@
           <label class="form-check-label" for="remember-me">Remember me</label>
         </div>
         <div class="d-grid">
-          <button type="submit" class="btn btn-primary" [disabled]="loginForm.invalid">Login</button>
+          <button type="submit" class="btn btn-primary" [disabled]="companyLoginForm.invalid">Login</button>
         </div>
         <div class="text-center mt-3">
           <a href="#" (click)="forgotPassword()">Forgot password?</a>

@@ -10,10 +10,22 @@ import { Client } from "../model/client.model";
 export class ClientService{
 
     private getAllClients = `${environment.localhost}Account/AllClients`
+    private getAllClientsOrders = `${environment.localhost}ClientOrders`
+    private deleteClient = `${environment.localhost}Account/Client?email=`
     constructor(private _http:HttpClient){}
 
     GetAllClients()
     {
         return this._http.get<Client[]>(this.getAllClients);
+    }
+
+    GetClientsOrders()
+    {
+        return this._http.get(this.getAllClientsOrders);
+    }
+
+    DeleteClient(email:string)
+    {
+        return this._http.delete(this.deleteClient+email);
     }
 }

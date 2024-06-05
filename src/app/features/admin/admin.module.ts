@@ -10,6 +10,10 @@ import { RegisterComponent } from './register/register.component';
 import { ReactiveFormsModule } from '@angular/forms';
 import { UsersComponent } from './users/users.component';
 import { CompaniesComponent } from './companies/companies.component';
+import { HTTP_INTERCEPTORS } from '@angular/common/http';
+import { AuthInterceptor } from '../../core/interceptor/auth.interceptor';
+import { ClientOrderComponent } from './client-order/client-order.component';
+import { CompanyOrderComponent } from './company-order/company-order.component';
 
 
 
@@ -21,13 +25,21 @@ import { CompaniesComponent } from './companies/companies.component';
     LoginComponent,
     RegisterComponent,
     UsersComponent,
-    CompaniesComponent
+    CompaniesComponent,
+    ClientOrderComponent,
+    CompanyOrderComponent
   ],
   imports: [
     CommonModule,
     AdminRoutingModule,
     RouterModule,
     ReactiveFormsModule
-  ]
+  ],providers: [
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: AuthInterceptor,
+      multi: true
+    }
+  ],
 })
 export class AdminModule { }

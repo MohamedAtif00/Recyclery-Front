@@ -13,9 +13,14 @@ export class UsersComponent implements OnInit{
   constructor(private clientServ:ClientService){}
 
   ngOnInit(): void {
-      this.clientServ.GetAllClients().subscribe(data=>{
-        this.clients = data
-      })
+     this.getAllClients();
+  }
+
+  getAllClients()
+  {
+    this.clientServ.GetAllClients().subscribe(data=>{
+      this.clients = data
+    })
   }
 
   addClient()
@@ -24,6 +29,10 @@ export class UsersComponent implements OnInit{
   editClient(client:Client)
   {}
 
-  deleteClient(id:string)
-  {}
+  deleteClient(email:string)
+  {
+    this.clientServ.DeleteClient(email).subscribe(data=>{
+      this.getAllClients()
+    });
+  } 
 }

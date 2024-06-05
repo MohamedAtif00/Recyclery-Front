@@ -9,6 +9,7 @@ import { Company } from '../model/company.model';
 })
 export class CompanyService {
   private getAllCompanies:string = `${environment.localhost}Account/AllCompanies`
+  private deleteCompany:string = `${environment.localhost}Account/Company?email=`
 
   constructor(private http: HttpClient) { }
 
@@ -24,7 +25,7 @@ export class CompanyService {
 //     return this.http.put<Company>(`${this.apiUrl}/${company.email}`, company);
 //   }
 
-//   deleteCompany(email: string): Observable<void> {
-//     return this.http.delete<void>(`${this.apiUrl}/${email}`);
-//   }
+  DeleteCompany(email: string): Observable<void> {
+    return this.http.delete<void>(`${this.deleteCompany}${email}`);
+  }
 }

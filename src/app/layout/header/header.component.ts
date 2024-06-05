@@ -1,4 +1,4 @@
-import { Component, ElementRef, HostListener, OnInit, Renderer2, TemplateRef, ViewChild, computed } from '@angular/core';
+import { Component, ElementRef, HostListener, OnInit, Renderer2, TemplateRef, ViewChild, computed, viewChild } from '@angular/core';
 import { IAuthInfo } from '../../core/model/user.model';
 import { AuthService } from '../../core/services/authentcation.service';
 import { NgbDropdown, NgbModal } from '@ng-bootstrap/ng-bootstrap';
@@ -29,6 +29,7 @@ export class HeaderComponent implements OnInit{
   addressForm!:FormGroup;
   passwordVisible: boolean = false;
   @ViewChild('modalTemplate') modalTemplate!: TemplateRef<any>;
+  @ViewChild('address') address! :TemplateRef<any>;
 
 
   currentLang!: string;
@@ -284,10 +285,12 @@ export class HeaderComponent implements OnInit{
 
   CreateOrder()
   {
-    this.cartServ.CreateOrder(this.addressForm.value.shipAddress.value).subscribe((data:Order)=>{
+    this.cartServ.CreateOrder(this.addressForm.value.shipAddress,this.addressForm.value.deliveryMethodId).subscribe(data=>{
       console.log(data);
-      
+      this.cartServ.emptyCart()
+      this.modalServ.open(this.address, { centered: true,windowClass:'custom-animation' });
     })
+    this.toaster.success('Order has made successfully ','success');
   }
 
 
