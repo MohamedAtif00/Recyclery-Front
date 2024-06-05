@@ -14,6 +14,18 @@
         },
         "@schematics/angular:pipe": {
           "standalone": false
+        },
+        "i18n": {
+          "locales": {
+            "ar": {
+              "translation": "src/locale/messages.ar.xlf",
+              "baseHref": "/ar/"
+            },
+            "en": {
+              "translation": "src/locale/messages.en.xlf",
+              "baseHref": "/en/"
+            }
+          }
         }
       },
       "root": "",
@@ -35,7 +47,9 @@
               "src/assets"
             ],
             "styles": [
+              "@angular/material/prebuilt-themes/purple-green.css",
               "node_modules/bootstrap/dist/css/bootstrap.min.css",
+              "node_modules/bootstrap/dist/css/bootstrap.rtl.min.css",
               "node_modules/slick-carousel/slick/slick.css",
               "node_modules/slick-carousel/slick/slick-theme.css",
               "node_modules/bootstrap-icons/font/bootstrap-icons.css",
@@ -102,6 +116,7 @@
               "src/assets"
             ],
             "styles": [
+              "@angular/material/prebuilt-themes/purple-green.css",
               "src/styles.css"
             ],
             "scripts": []

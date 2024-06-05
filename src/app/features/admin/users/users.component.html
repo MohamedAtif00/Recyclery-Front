@@ -1,0 +1,28 @@
+<div class="container">
+    <h2>Clients</h2>
+    <button class="btn btn-primary mb-2" (click)="addClient()">Add Client</button>
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Display Name</th>
+          <th>Email</th>
+          <th>Phone Number</th>
+          <th>Client Preferences</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let client of clients">
+          <td>{{ client.displayName }}</td>
+          <td>{{ client.email }}</td>
+          <td>{{ client.phoneNumber }}</td>
+          <td>{{ client.clientPreferences }}</td>
+          <td>
+            <button class="btn btn-primary" (click)="editClient(client)">Edit</button> |
+            <button class="btn btn-danger" (click)="deleteClient(client.email)">Delete</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  

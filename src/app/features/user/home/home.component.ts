@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { TranslationService } from '../../../core/services/translation-loader.service';
+import { AuthService } from '../../../core/services/authentcation.service';
 
 @Component({
   selector: 'app-home',
@@ -9,16 +11,27 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 })
 export class HomeComponent implements OnInit {
   slides = [
-    { img: 'https://dashboard.bekia-egypt.com//storage/items_categories/VRvy88AzmfJzE3BxOu7zgAN94Tgl2k0eDyndWX5Z.png', name: 'Sports Equipment' },
-    { img: 'https://dashboard.bekia-egypt.com//storage/items_categories/150ae6811b76cd9917ba7c52429d7b18.png', name: 'Kids Toys' },
-    { img: 'https://dashboard.bekia-egypt.com//storage/items_categories/LWFCShcrgc1tIINMZlJwRbIfEcSW1lqJtL4Zlo16.png', name: 'Plastic' },
-    { img: 'https://dashboard.bekia-egypt.com//storage/items_categories/wZqzAnvQPEd7jrGdHEb5QXh68eLahTPSGF1vVSVt.png', name: 'Paper' },
-    { img: 'https://dashboard.bekia-egypt.com//storage/items_categories/DwdOpigjER2YvdFKB04fRzMNpDPNZvzzVcYdMkfZ.png', name: 'Cooking Oil' },
-    { img: 'https://dashboard.bekia-egypt.com//storage/items_categories/3IjNxQWhqr2EGuZCutzq3ZX2hR1gpK9D86GOeDah.png', name: 'Electronics' },
-    { img: 'https://dashboard.bekia-egypt.com//storage/items_categories/CHdJqKaHhDeNMMAIgtFaFciDXFUSY93cjRhpNhr5.png', name: 'Metals' },
-    { img: 'https://dashboard.bekia-egypt.com//storage/items_categories/Oy4fLdFmP2yE03Z0s4FnqT81c2NBlEPZgmGuAoKB.png', name: 'Home Appliances' },
-    { img: 'https://dashboard.bekia-egypt.com//storage/items_categories/jhdQJEPRCMFVaFJqDgWtZ6GqfgJAJtw9xEAuHHqf.png', name: 'Antiques' },
-    { img: 'https://dashboard.bekia-egypt.com//storage/items_categories/Z8fwTzk3aFAgO8AgKjXDV1gjYFH574wvY1BoPT4Z.png', name: 'Spare Parts' }
+    { img:   'https://dashboard.bekia-egypt.com//storage/items_categories/VRvy88AzmfJzE3BxOu7zgAN94Tgl2k0eDyndWX5Z.png', 
+    name: 'Sports Equipment' ,
+    nameAr:'ادوات رياضية'},
+    { img: 'https://dashboard.bekia-egypt.com//storage/items_categories/150ae6811b76cd9917ba7c52429d7b18.png',
+     name: 'Kids Toys' },
+    { img: 'https://dashboard.bekia-egypt.com//storage/items_categories/LWFCShcrgc1tIINMZlJwRbIfEcSW1lqJtL4Zlo16.png', 
+    name: 'Plastic' },
+    { img: 'https://dashboard.bekia-egypt.com//storage/items_categories/wZqzAnvQPEd7jrGdHEb5QXh68eLahTPSGF1vVSVt.png', 
+    name: 'Paper' },
+    { img: 'https://dashboard.bekia-egypt.com//storage/items_categories/DwdOpigjER2YvdFKB04fRzMNpDPNZvzzVcYdMkfZ.png', 
+    name: 'Cooking Oil' },
+    { img: 'https://dashboard.bekia-egypt.com//storage/items_categories/3IjNxQWhqr2EGuZCutzq3ZX2hR1gpK9D86GOeDah.png',
+     name: 'Electronics' },
+    { img: 'https://dashboard.bekia-egypt.com//storage/items_categories/CHdJqKaHhDeNMMAIgtFaFciDXFUSY93cjRhpNhr5.png', 
+    name: 'Metals' },
+    { img: 'https://dashboard.bekia-egypt.com//storage/items_categories/Oy4fLdFmP2yE03Z0s4FnqT81c2NBlEPZgmGuAoKB.png', 
+    name: 'Home Appliances' },
+    { img: 'https://dashboard.bekia-egypt.com//storage/items_categories/jhdQJEPRCMFVaFJqDgWtZ6GqfgJAJtw9xEAuHHqf.png', 
+    name: 'Antiques' },
+    { img: 'https://dashboard.bekia-egypt.com//storage/items_categories/Z8fwTzk3aFAgO8AgKjXDV1gjYFH574wvY1BoPT4Z.png', 
+    name: 'Spare Parts' }
   ];
 
   registerForm!: FormGroup;
@@ -33,7 +46,7 @@ export class HomeComponent implements OnInit {
     autoplaySpeed: 2000
   };
 
-  constructor(private fb: FormBuilder, private modalService: NgbModal) {}
+  constructor(private fb: FormBuilder,private AuthServ:AuthService, private modalService: NgbModal,public translation:TranslationService) {}
 
   ngOnInit(): void {
     this.registerForm = this.fb.group({
@@ -76,6 +89,10 @@ export class HomeComponent implements OnInit {
   onSubmit() {
     if (this.registerForm.valid) {
       console.log('Registration successful', this.registerForm.value);
+      this.AuthServ.CompanyReegister(this.registerForm.value).subscribe(data=>{
+        console.log(data);
+        
+      })
       // Handle successful registration, e.g., make API call
       this.modalService.dismissAll(this.registerForm.value);
     } else {

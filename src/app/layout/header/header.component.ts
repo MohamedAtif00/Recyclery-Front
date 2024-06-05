@@ -1,4 +1,4 @@
-import { Component, ElementRef, HostListener, OnInit, TemplateRef, computed } from '@angular/core';
+import { Component, ElementRef, HostListener, OnInit, Renderer2, TemplateRef, ViewChild, computed } from '@angular/core';
 import { IAuthInfo } from '../../core/model/user.model';
 import { AuthService } from '../../core/services/authentcation.service';
 import { NgbDropdown, NgbModal } from '@ng-bootstrap/ng-bootstrap';
@@ -7,6 +7,12 @@ import { RegisterRequest } from '../../core/model/request/register.model';
 import { LoginRequest } from '../../core/model/request/login.model';
 import { CartService } from '../../shared/service/cart.service';
 import { Product } from '../../shared/model/product.model';
+import { TranslateService } from '@ngx-translate/core';
+import { TranslationService } from '../../core/services/translation-loader.service';
+import { Item } from '../../shared/model/item.model';
+import { MatDialog } from '@angular/material/dialog';
+import { Order } from '../../shared/model/order.model';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-header',
@@ -19,14 +25,42 @@ export class HeaderComponent implements OnInit{
   authUser!: IAuthInfo | null;
   registerForm!:FormGroup;
   loginForm!: FormGroup;
+  companyLoginForm!:FormGroup;
+  addressForm!:FormGroup;
   passwordVisible: boolean = false;
+  @ViewChild('modalTemplate') modalTemplate!: TemplateRef<any>;
 
+
+  currentLang!: string;
   //totalOrders:number = computed();
   constructor(public authService: AuthService,
               private modalServ:NgbModal,
               private fb:FormBuilder,
               public cartServ:CartService,
-              private elementRef: ElementRef) {}
+              private elementRef: ElementRef,
+              private translationService:TranslationService,
+              private renderer: Renderer2,
+              public dialog:MatDialog,
+              private authServ:AuthService,
+              private toaster:ToastrService) 
+              {
+                this.currentLang = 'en'; // default
+              }
+
+              switchLanguage(selectElement: HTMLSelectElement) {
+                if(selectElement.value)
+                  {
+                    this.translationService.switchLanguage(selectElement.value);
+                    this.currentLang = selectElement.value;
+
+                  }
+                
+              }
+
+              updateDirection(language: string) {
+                const direction = language === 'ar' ? 'rtl' : 'ltr';
+                this.renderer.setAttribute(document.documentElement, 'dir', direction);
+              }
 
   slides = [
     { name: 'Sports Equipment' },
@@ -47,6 +81,51 @@ export class HeaderComponent implements OnInit{
     this.isOpen = !this.isOpen;
   }
 
+  ngOnInit(): void {
+    // Set initial language from the translation service
+    this.currentLang = this.translationService['translate'].currentLang || this.translationService['translate'].defaultLang;
+    //this.totalItemsInCart = this.cartServ.cart().products.length
+    this.loginForm = this.fb.group({
+      email: ['', [Validators.required, Validators.email]],
+      password: ['', Validators.required]
+    });
+
+    this.companyLoginForm = this.fb.group({
+      email: ['', [Validators.required, Validators.email]],
+      password: ['', Validators.required]
+    });
+
+    this.registerForm = this.fb.group(
+      {
+        FullName:['',Validators.required],
+        Email:['',Validators.required],
+        RecyclingPreferences:['',Validators.required],
+        PhoneNumber:['',Validators.required],
+        Password:['',Validators.required]
+      }
+    )
+
+    this.addressForm = this.fb.group({
+      deliveryMethodId: ['', Validators.required],
+      shipAddress: this.fb.group({
+        firstName: ['', Validators.required],
+        lastName: ['', Validators.required],
+        street: ['', Validators.required],
+        city: ['', Validators.required],
+        country: ['', Validators.required]
+      })
+    });
+  
+
+
+
+    this.authService.stateItem$.subscribe(data => {
+      this.authUser = data;
+      if (this.authUser) {
+        console.log(this.authUser.displayName); // Assuming you want to log the displayName
+      }
+    });
+  }
   @HostListener('document:click', ['$event'])
   clickOutside(event: Event) {
     const clickedInsideIcon = this.elementRef.nativeElement.querySelector('.img-fluid') === event.target ;
@@ -55,6 +134,9 @@ export class HeaderComponent implements OnInit{
     if (!this.isInsideBasket(event.target) && !clickedInsideIcon && !btn) {
       this.closeBasketDrawer();
     }
+  }
+  onCancel(): void {
+    this.modalServ.dismissAll();
   }
 
   isInsideBasket(target: any): boolean {
@@ -73,35 +155,26 @@ export class HeaderComponent implements OnInit{
     this.isOpen = false;
   }
 
-  ngOnInit(): void {
-    //this.totalItemsInCart = this.cartServ.cart().products.length
-    this.loginForm = this.fb.group({
-      email: ['', [Validators.required, Validators.email]],
-      password: ['', Validators.required]
-    });
 
-    this.registerForm = this.fb.group(
-      {
-        FullName:['',Validators.required],
-        Email:['',Validators.required],
-        RecyclingPreferences:['',Validators.required],
-        PhoneNumber:['',Validators.required],
-        Password:['',Validators.required]
-      }
-    )
+  openDialog(address: TemplateRef<any>,login:TemplateRef<any>): void {
+    
+    this.authServ.stateItem$.subscribe(data=>{
+      if(data != null)
+        {
+          this.modalServ.open(address, { centered: true, windowClass: 'custom-animation' });
+
+        }else{
+          this.toaster.info('Please Login First','warning');
+          this.modalServ.open(login, { centered: true, windowClass: 'custom-animation' });
+        }
 
 
+    })
+    
 
-    this.authService.stateItem$.subscribe(data => {
-      this.authUser = data;
-      if (this.authUser) {
-        console.log(this.authUser.displayName); // Assuming you want to log the displayName
-      }
-    });
   }
-
   
-  increaseQuantity(product: Product) {
+  increaseQuantity(product: Item) {
     this.cartServ.addProduct(product);
   }
 
@@ -110,8 +183,10 @@ export class HeaderComponent implements OnInit{
   }
 
   removeProduct(productName: string) {
-    this.cartServ.removeProduct(productName);
+    this.cartServ.removeWholeProduct(productName)
   }
+
+  
 
   onRegisterSubmit(): void {
     if (this.registerForm.valid) {
@@ -144,6 +219,7 @@ export class HeaderComponent implements OnInit{
   RegisterOpen(content: TemplateRef<any>) {
 		this.modalServ.open(content, { centered: true,windowClass:'custom-animation' });
 	}
+  
   open(content: TemplateRef<any>) {
     this.modalServ.open(content, { ariaLabelledBy: 'modal-basic-title' });
   }
@@ -176,6 +252,27 @@ export class HeaderComponent implements OnInit{
     }
   }
 
+  CompanyLoginSubmit()
+  {
+    if (this.companyLoginForm.valid) {
+      let request:LoginRequest = this.companyLoginForm.value
+      this.authService.login(request).subscribe(
+        (response) => {
+          console.log('Login successful', response);
+          // Handle successful registration, e.g., update UI, close modal, etc.
+          this.modalServ.dismissAll();
+        },
+        (error) => {
+          console.error('Login failed', error);
+          // Handle registration error, e.g., show error message
+        }
+      );
+    } else {
+      console.log('Form is not valid');
+    }
+  }
+
+
   forgotPassword(): void {
     // Handle forgot password logic
   }
@@ -183,6 +280,14 @@ export class HeaderComponent implements OnInit{
   removePlaceholder(event: Event) {
     const selectElement = event.target as HTMLSelectElement;
     selectElement.classList.remove('placeholder');
+  }
+
+  CreateOrder()
+  {
+    this.cartServ.CreateOrder(this.addressForm.value.shipAddress.value).subscribe((data:Order)=>{
+      console.log(data);
+      
+    })
   }
 
 

@@ -7,20 +7,18 @@
         <div class="col-lg-8 align-self-start p-0">
           <!-- <h1 class="text-white font-weight-bold">Discover your Favorite Coach</h1> -->
           <!-- <p>Current Language: {{ currentLang }}</p> -->
-          <h1 class=" fw-normal p-0" style="color: #38af44;"> Make money from your waste with Recycler</h1>
-          <!-- <h1>{{ 'HOME_TITLE' | translate }}</h1> -->
-          <!-- <button (click)="switchLanguage('en')">English</button>
+          <h1 class=" fw-normal p-0" style="color: #38af44;"> {{'HELLO_HI' | translate}}</h1>
+          <!-- <h1>{{ 'HOME_TITLE' | translate }}</h1>
+          <button (click)="switchLanguage('en')">English</button>
           <button (click)="switchLanguage('ar')">العربية</button> -->
           <!-- <hr class="divider" /> -->
         </div>
         <div class="col-lg-8 align-self-baseline">
           <p class="text-secondary mb-3" >
-            Discover the coach who will inspire and empower you to reach your
-            goals. Our diverse team of professionals is dedicated to helping you
-            achieve lasting change and fulfillment in every aspect of your life.
+            {{'Description' | translate}}
           </p>
           <a class="btn btn-xl text-light rounded-2 fs-5 px-2 mt-0" style="background-color: #38af44;" [routerLink]="['book']"
-            >Yala Book Now!</a
+            >{{'BookNow' | translate}}</a
           >
         </div>
       </div>
@@ -29,8 +27,8 @@
  
   <!-- services-section.component.html -->
 <div class="section services-section text-center mt-5 pt-3 vh-100">
-    <h2 class="section-title" style="color: #38af44;">How to use Recyclery easily?</h2>
-    <p class="section-description text-secondary">It takes 3 minutes to book your order</p>
+    <h2 class="section-title" style="color: #38af44;">{{'HowToUse' | translate}}</h2>
+    <p class="section-description text-secondary">{{'It takes 3 minutes to book your order' | translate}}</p>
     <div class="services-list">
       <div class="container">
         <div class=" d-flex flex-row pt-4 gap-4 ms-4 justify-content-end align-items-end">
@@ -43,8 +41,8 @@
                 </div>
               </div>
               <div class="card-body">
-                <h3 class="card-title">Make an account</h3>
-                <p class="card-text">Add your information to make all of the process easy</p>
+                <h3 class="card-title">{{'Make an account' | translate}}</h3>
+                <p class="card-text">{{'Add your information to make all of the process easy' | translate}}</p>
               </div>
             </div>
           </div>
@@ -57,8 +55,8 @@
                 </div>
               </div>
               <div class="card-body">
-                <h3 class="card-title">Separate your waste</h3>
-                <p class="card-text">Separate your waste and start to input your amounts</p>
+                <h3 class="card-title">{{'Separate your waste' | translate}}</h3>
+                <p class="card-text">{{'Separate your waste and start to input your amounts' | translate}}</p>
               </div>
             </div>
           </div>
@@ -71,8 +69,8 @@
                 </div>
               </div>
               <div class="card-body">
-                <h3 class="card-title">Book your order</h3>
-                <p class="card-text">We send our collector to your doorstep</p>
+                <h3 class="card-title">{{'Book your order'|translate}}</h3>
+                <p class="card-text">{{'We send our collector to your doorstep'|translate}}</p>
               </div>
             </div>
           </div>
@@ -83,22 +81,22 @@
   
   
   <!-- slider.component.html -->
-<div class="home-section">
+<div class="home-section" >
     <div class="section testimonials-section text-center">
-      <h2 class="section-title">We collect the following</h2>
-      <p class="section-description">You should separate your waste according to our classification</p>
+      <h2 class="section-title">{{'We collect the following'|translate}}</h2>
+      <p class="section-description">{{'You should separate your waste according to our classification'|translate}}</p>
       <div class="section-body">
         <div class="custom-tabs">
           <div class="tabs-header"></div>
           <div class="tabs-body">
             <div class="slider-holder">
-              <ngx-slick-carousel class="bekia-slider" #slickModal="slick-carousel" [config]="slideConfig">
+              <ngx-slick-carousel dir="ltr" class="bekia-slider" #slickModal="slick-carousel" [config]="slideConfig">
                 <div ngxSlickItem *ngFor="let item of slides" class="slide">
                   <div class="bekia-card text-center">
                     <div class="image-ratio category-image">
                       <div class="ratio-content">
                         <img [src]="item.img" [alt]="item.img" class="mx-auto">
-                        <h3 class="name text-center d-flex justify-content-center pt-auto">{{item.name}}</h3>
+                        <h3 class="name text-center d-flex justify-content-center pt-auto">{{translation.current == 'en'? item.name:item.nameAr}}</h3>
                       </div>
                     </div>
                   </div>

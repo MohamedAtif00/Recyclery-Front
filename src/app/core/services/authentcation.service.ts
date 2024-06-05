@@ -5,6 +5,7 @@ import { IAuthInfo } from "../model/user.model";
 import { RegisterRequest } from "../model/request/register.model";
 import { environment } from "../../../environment";
 import { LoginRequest } from "../model/request/login.model";
+import { AdminRegister } from "../../features/admin/model/admin-register.model";
 
 
 
@@ -15,7 +16,11 @@ export class AuthService {
 
   //register
   private postRegister:string =`${environment.localhost}Account/ClientRegister`
+  private postComapanyRegister:string =`${environment.localhost}Account/CompanyRegister`
+  private postAdminRegister:string = `${environment.localhost}Account/AdminRegister`
   private postLogin:string =`${environment.localhost}Account/ClientLogin  `
+  private postCompanyLogin:string =`${environment.localhost}Account/CompanyLogin  `
+  private postLoginAdmin:string = `${environment.localhost}Account/AdminLogin`
 
 
   private stateItem: BehaviorSubject<IAuthInfo | null> = new BehaviorSubject<IAuthInfo | null>(this.getAuthInfoFromStorage());
@@ -26,6 +31,33 @@ export class AuthService {
   login(request:LoginRequest): Observable<IAuthInfo> {
     return this._http.post<IAuthInfo>(this.postLogin,request ).pipe(
       map((response: IAuthInfo) => {
+        response.role = 'user';
+        this.setAuthInfoToStorage(response);
+        this.stateItem.next(response);
+        return response;
+      }),
+      catchError(this.handleError)
+    );
+  }
+
+  CompanyLogin(request:LoginRequest) : Observable<IAuthInfo>
+  {
+    return this._http.post<IAuthInfo>(this.postCompanyLogin,request ).pipe(
+      map((response: IAuthInfo) => {
+        response.role = 'company';
+        this.setAuthInfoToStorage(response);
+        this.stateItem.next(response);
+        return response;
+      }),
+      catchError(this.handleError)
+    );
+  }
+
+  AdminLogin(request:LoginRequest)
+  {
+    return this._http.post<IAuthInfo>(this.postLoginAdmin,request ).pipe(
+      map((response: IAuthInfo) => {
+        response.role = 'company';
         this.setAuthInfoToStorage(response);
         this.stateItem.next(response);
         return response;
@@ -39,6 +71,7 @@ export class AuthService {
     return this._http.post<IAuthInfo>(this.postRegister,request).pipe(
       map(
         (response)=>{
+          response.role = 'user';
           console.log('From Authentication Service',response);
           this.setAuthInfoToStorage(response);
           this.stateItem.next(response);
@@ -48,6 +81,37 @@ export class AuthService {
     )
   }
 
+  CompanyReegister(request:RegisterRequest)
+  {
+    return this._http.post<IAuthInfo>(this.postComapanyRegister,request).pipe(
+      map(
+        (response)=>{
+          response.role= 'company';
+          console.log('From Authentication Service',response);
+          this.setAuthInfoToStorage(response);
+          this.stateItem.next(response);
+          return response;
+        }
+      )
+    )
+  }
+
+  AdminRegister(request:AdminRegister)
+  {
+    return this._http.post<IAuthInfo>(this.postAdminRegister,request).pipe(
+      map(
+        (response)=>{
+          response.role= 'admin';
+          console.log('From Authentication Service',response);
+          this.setAuthInfoToStorage(response);
+          this.stateItem.next(response);
+          return response;
+        }
+      )
+    )
+  }
+
+
   logout(): void {
     this.clearAuthInfoFromStorage();
     this.stateItem.next(null);
@@ -55,6 +119,11 @@ export class AuthService {
 
   isAuthenticated(): boolean {
     return !!this.stateItem.value;
+  }
+
+  isAdmin()
+  {
+    return this.stateItem.value?.role  == 'admin'
   }
 
   getAuthToken(): string | null {

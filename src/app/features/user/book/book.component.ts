@@ -1,19 +1,21 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { SlickCarouselComponent } from 'ngx-slick-carousel';
 import { Cart } from '../../../shared/model/cart.model';
 import { Product } from '../../../shared/model/product.model';
 import { CartService } from '../../../shared/service/cart.service';
+import { ProductService } from '../../../shared/service/product.service';
+import { Item } from '../../../shared/model/item.model';
 
 @Component({
   selector: 'app-book',
   templateUrl: './book.component.html',
   styleUrl: './book.component.css'
 })
-export class BookComponent {
+export class BookComponent implements OnInit{
 
 
 
-   items:Product[] = [
+   items= [
     { id: 0, productName: 'Chair', pictureUrl: 'https://dashboard.bekia-egypt.com//storage/items/eCmzdy4YI1bjs4GRg7ORHnZ25evL0UOhwYspXKXa.png', category: 'piece', price: 380, quantity: 0 },
     { id: 1, productName: 'Plastics', pictureUrl: 'https://dashboard.bekia-egypt.com//storage/items/Ghk5ylX4gtpHQjax7M1n5dvGf1VZGXwKkKcWkVR1.png', category: 'kg', price: 190, quantity: 0 },
     { id: 2, productName: 'Coleman Water', pictureUrl: 'https://dashboard.bekia-egypt.com//storage/items/ZKrQHf68q4Qt06T6Ok4MIfKAlNQQTthMaDtY20Ms.png', category: 'piece', price: 285, quantity: 0 },
@@ -22,7 +24,7 @@ export class BookComponent {
     { id: 5, productName: 'Solid Plastic', pictureUrl: 'https://dashboard.bekia-egypt.com//storage/items/ba0d59426216fc0fd61dee2d5f553125.png', category: 'kg', price: 19, quantity: 0 }
 ];
 
-constructor(private cartServ:CartService){}
+constructor(private cartServ:CartService,public prodServ:ProductService){}
 
 
   // slideConfig = {
@@ -34,6 +36,10 @@ constructor(private cartServ:CartService){}
   //   autoplay: true,
   //   autoplaySpeed: 2000
   // };
+
+  ngOnInit(): void {
+    this.prodServ.products
+  }
 
 
 
@@ -68,8 +74,14 @@ constructor(private cartServ:CartService){}
     ]
   };
 
-  AddToCart(item:Product)
+  AddToCart(product:Product)
   {
+    let item:Item  ={id:product.id,
+                     productName:product.name,
+                     pictureUrl:product.pictureUrl,
+                     category:product.category,
+                     price:product.price,
+                     quantity:1} 
     this.cartServ.addProduct(item)
   } 
 
